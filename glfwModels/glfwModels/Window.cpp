@@ -80,8 +80,6 @@ void Window::idle_callback()
 {
 	// Perform any updates as necessary. Here, we will spin the current model slightly.
 	curr_model->update();
-
-
 }
 
 void Window::display_callback(GLFWwindow* window)

@@ -1,5 +1,8 @@
 #ifndef OBJOBJECT_H
 #define OBJOBJECT_H
+#define BUNNY_SCALE (float) 7.5
+#define DRAGON_SCALE (float) 9
+#define BEAR_SCALE (float) 0.9
 
 #ifdef __APPLE__
 #include <OpenGL/gl3.h>

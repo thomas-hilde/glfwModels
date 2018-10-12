@@ -1,6 +1,6 @@
 #include "OBJObject.h"
-#include <iostream> // Needed to use cerr and endl
-#include <limits>       // std::numeric_limits
+#include <iostream>
+#include <limits>
 #include "Window.h"
 
 OBJObject::OBJObject(const char *filepath)
@@ -11,13 +11,12 @@ OBJObject::OBJObject(const char *filepath)
 
 void OBJObject::parse(const char *filepath)
 {
-	//TODO parse the OBJ file
 	FILE* fp;     // file pointer
 	float x, y, z;  // vertex coordinates
 	float r, g, b;  // vertex color
 	float scale;  // Scale model size
 
-	// Used to reduce code clutter
+	// Used to improve code readability
 	float min = (float)std::numeric_limits<int>::min();
 	float max = (float)std::numeric_limits<int>::max();
 
@@ -25,35 +24,57 @@ void OBJObject::parse(const char *filepath)
 	float min_x = max, min_y = max, min_z = max;
 	float max_x = min, max_y = min, max_z = min;
 	float center_x, center_y, center_z;
-	int c1, c2;    // characters read from file
 
+	// Used to distingush between vertex lines, vertex normal lines, or other
+	int c1, c2;    
 
-	fp = fopen(filepath, "rb");  // make the file name configurable so you can load other files
-	if (fp == NULL) { std::cerr << "error loading file" << std::endl; exit(-1); }  // just in case the file can't be found or is corrupt
+	// Open file with read enabled
+	fp = fopen(filepath, "rb");  
+
+	// Check if file was loaded properly
+	if (fp == NULL) {
+		
+		// Print error message
+		std::cerr << std::endl << "File: \"" << filepath << "\" did not load properly." << std::endl;
+		
+		// Prompt user to end program
+		std::cout << "Please press any key to end the program." << std::endl;
+		system("pause > nul");
+		exit(-1);
+	}
 
 	// Set scale values according to model
-	if (filepath == "bunny.obj") { scale = (float) 7.5; }
-	if (filepath == "dragon.obj") { scale = (float)9; }
-	if (filepath == "bear.obj") { scale = (float) 0.9; }
+	if (filepath == "bunny.obj") { scale = BUNNY_SCALE; }
+	if (filepath == "dragon.obj") { scale = DRAGON_SCALE; }
+	if (filepath == "bear.obj") { scale = BEAR_SCALE; }
 
 	// Get initial characters of first line
 	c1 = fgetc(fp);
 	c2 = fgetc(fp);
 
+	// Begin scanning file
 	while (c1 != EOF && c2 != EOF) {
-		// Handle vertex lines
+
+		// Check for vertex lines
 		if ((c1 == 'v') && (c2 == ' '))
 		{
+			// Read in values for x, y, z, r, g ,b. The r, g, b values will not be used for this project.
+			// However it is necessary to scan for r, g, b to finish scanning current line.
 			fscanf(fp, "%f %f %f %f %f %f", &x, &y, &z, &r, &g, &b);
+
+			// Set min/max values accordingly
 			if (x < min_x) { min_x = x; }
 			if (x > max_x) { max_x = x; }
 			if (y < min_y) { min_y = y; }
 			if (y > max_y) { max_y = y; }
 			if (z < min_z) { min_z = z; }
 			if (z > max_z) { max_z = z; }
+
+			// Push x, y, z values to vertices array for each point of the model
 			vertices.push_back(glm::vec3(x, y, z));
 		}
-		// read normal data accordingly
+
+		// Check for vertex normal lines
 		else if ((c1 == 'v') && (c2 == 'n'))
 		{
 			fscanf(fp, "%f %f %f", &x, &y, &z);
